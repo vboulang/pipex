@@ -5,51 +5,64 @@
 #                                                     +:+ +:+         +:+      #
 #    By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
-#    Created: 2023/11/01 15:27:01 by vboulang          #+#    #+#              #
-#    Updated: 2023/11/08 11:13:46 by vboulang         ###   ########.fr        #
+#    Created: 2023/12/01 14:34:28 by vboulang          #+#    #+#              #
+#    Updated: 2023/12/01 14:46:30 by vboulang         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-NAME	=	libftprintf.a
+#Program names
+NAME	=	pipex
 
-SRC	= 	ft_printf.c \
-		ft_hexa.c \
-		ft_putnbr_fd_return.c \
-		ft_putstr_fd_return.c \
-		ft_strlen.c \
-		ft_putchar_fd.c \
-		ft_hexa_add.c \
-		ft_putnbr_ui_return.c
-
-OBJ	=	$(SRC:.c=.o)
-
-AR	=	ar
-
+#Compiling variables
 CC	=	gcc
-
-CFLAGS	=	-Wall -Werror -Wextra #-fsanitize=address
-
+CFLAGS	=	-Wall -Werror -Wextra -g #-fsanitize=address
 LIBFLAGS	=	-L. -I. -lftprintf
 
+#Directories
+LIBDIR = libft
+SRCDIR = src
+INCDIR = inc
+OBJDIR = obj
+
+#Library names
+LIBFT = $(LIBDIR)/libft.a
+
+#.h files name
+INC = $(INCDIR)/pipex.h
+
+#Command lines
 RM	=	rm -f
+MK	=	mkdir -p
+
+#Source files
+
+SRC	= 	pipex.c 
+
+VPATH = $(SRCDIR)
+
+#Object files
+OBJ	=	$(addprefix $(OBJDIR)/,$(SRC:%.c=%.o))
 
 all: $(NAME)
 
-$(NAME):	$(OBJ)
-	$(AR) -rcs $(NAME) $?
+$(NAME):	$(OBJDIR) $(OBJ)
+	make -C $(LIBFTDIR)
+	$(CC) $(CFLAGS) $(OBJ) $(LIBFT) -o $(NAME)
 
-test: all
-	$(CC) $(CFLAGS) $(LIBFLAGS) main.c -o test
-	
-%.o: %.c
-	$(CC) -c $(CFLAGS) $?	
+$(OBJDIR)/%.o: %.c $(INC)
+	$(CC) $(CFLAGS) -I$(INCDIR) -I$(LIBFTDIR) -c $< -o $@
+
+$(OBJDIR):
+	$(MK) $(OBJDIR)
 
 clean:
-	$(RM) $(OBJ)
+	$(RM) $(OBJDIR)
+	make -C $(LIBFTDIR) clean
 
 fclean: clean
 	$(RM) $(NAME)
+	make -C $(LIBFTDIR) fclean
 
 re: fclean all
 
-.PHONY: all clean fclean re test
+.PHONY: all clean fclean re
