@@ -6,7 +6,7 @@
 /*   By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 14:34:08 by vboulang          #+#    #+#             */
-/*   Updated: 2023/12/01 15:05:31 by vboulang         ###   ########.fr       */
+/*   Updated: 2023/12/01 16:43:56 by vboulang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,6 +18,6 @@
 # include <string.h>
 # include <sys/wait.h>
 
-
+int	main(int argc, char **argv);
 
 #endif
