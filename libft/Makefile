@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: vboulang <vboulang@student.42quebec.com>   +#+  +:+       +#+         #
+#    By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/10/17 10:38:43 by vboulang          #+#    #+#              #
-#    Updated: 2023/10/30 11:46:54 by vboulang         ###   ########.fr        #
+#    Updated: 2023/12/06 13:33:46 by vboulang         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -75,19 +75,19 @@ RM = rm -f
 all: $(NAME)
 
 $(NAME):	$(OBJ)
-	$(AR) -r $(NAME) $?
+	@$(AR) -r $(NAME) $?
 
 %.o: %.c
-	$(CC) -c $(CFLAGS) $?
+	@$(CC) -c $(CFLAGS) $?
 
 bonus: $(OBJ) $(OBJ_BONUS)
 	$(AR) -r $(NAME) $?
 
 clean:
-	$(RM) $(OBJ) $(OBJ_BONUS) 
+	@$(RM) $(OBJ) $(OBJ_BONUS) 
 
 fclean: clean
-	$(RM) $(NAME)
+	@$(RM) $(NAME)
 
 re: fclean all
 
