@@ -6,11 +6,28 @@
 /*   By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 14:34:12 by vboulang          #+#    #+#             */
-/*   Updated: 2023/12/14 18:22:06 by vboulang         ###   ########.fr       */
+/*   Updated: 2023/12/14 18:52:10 by vboulang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/pipex.h"
+
+char	*get_path(char **envp, char *str)
+{
+	int	i;
+	int	path_not_found;
+	
+	i = 0;
+	path_not_found = 1;
+	while (envp[i] && path_not_found)
+	{
+		if (!ft_strnstr(envp[i], "PATH", 4))
+			i++;
+		else
+			path_not_found = 0;
+	}
+	
+}
 
 int	main(int argc, char **argv, char **envp)
 {
@@ -25,6 +42,9 @@ int	main(int argc, char **argv, char **envp)
 		if (access(argv[1], R_OK) == -1)
 			return (0); //TODO Make error message
 		pipe(fd);
+
+		//START LOOP
+		//while()
 		id = fork();
 		if (id == -1)
 			return (0); //TODO Make error message
@@ -45,6 +65,7 @@ int	main(int argc, char **argv, char **envp)
 			if (execve(path, cmd, NULL) == -1)
 				return (0); //TODO Make an error message
 		}
+		//END LOOP
 		id = fork();
 		if (id == -1)
 			return (0); //TODO Make error message
