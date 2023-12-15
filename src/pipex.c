@@ -6,7 +6,7 @@
 /*   By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 14:34:12 by vboulang          #+#    #+#             */
-/*   Updated: 2023/12/15 16:24:06 by vboulang         ###   ########.fr       */
+/*   Updated: 2023/12/15 17:18:00 by vboulang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,28 +42,26 @@ char	*get_path(char **envp, char *str)
 		else
 			free(correct_path);
 		i++;
-		//TODO test correct path with access X_OK. Si ok, return correct_path (free avant ce qu<on utilise pas)
 	}
 	free(correct_path);
 	return(NULL);//TODO message incorrect command
 }
 
-int	dupfct(int *fd, int fd_file, t_cmd cmd)
+int	dupfct(int *fd, int fd_file, int nb)
 {
-	if (cmd.pnb == 0)
+	if (nb == 0)
 	{
-
 		if (dup2(fd[1], STDOUT_FILENO) == -1)
-			return (0); //TODO Make error message
+			return (-1); //TODO Make error message
 		if (dup2(fd_file, STDIN_FILENO) == -1)
-			return (0); //TODO Make error message
+			return (-1); //TODO Make error message
 	}
 	else
 	{
 		if (dup2(fd_file, STDOUT_FILENO) == -1)
-			return (0); //TODO Make error message
+			return (-1); //TODO Make error message
 		if (dup2(fd[0], STDIN_FILENO) == -1)
-			return (0); //TODO Make error message
+			return (-1); //TODO Make error message
 	}
 	return (0);
 }
@@ -85,7 +83,7 @@ int	main(int argc, char **argv, char **envp)
 		{
 			id = fork();
 			if (id == -1)
-				return (0); //TODO Make error message
+				return (printf("fork failed")); //TODO Make error message
 			if (id == 0)
 			{
 				if (cmd.pnb == 0)
@@ -93,16 +91,18 @@ int	main(int argc, char **argv, char **envp)
 				else
 					fd_file = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0666);
 				if (fd_file == -1)
-					return (0); //TODO Make error message
-				if (dupfct(fd, fd_file, cmd) == -1)
-					return (0); //TODO Make error message and change if comparison to match error returned
+					return (printf("open failed")); //TODO Make error message
+				if (dupfct(fd, fd_file, cmd.pnb) == -1)
+					return (printf("failed dup")); //TODO Make error message and change if comparison to match error returned
 				close(fd[0]);
 				close(fd[1]);
 				close(fd_file);
-				cmd.cmd = ft_split(argv[2], ' ');
-				cmd.path = get_path(envp, cmd.cmd[0]); //TODO check if good path, access X_OK
+				cmd.cmd = ft_split(argv[cmd.pnb + 2], ' ');
+				cmd.path = get_path(envp, cmd.cmd[0]);
+				if (!cmd.path)
+					return(printf("path not found"));
 				if (execve(cmd.path, cmd.cmd, NULL) == -1)
-					return (0); //TODO Make an error message
+					return (printf("failed command")); //TODO Make an error message
 			}
 			cmd.pnb += 1;
 		}
