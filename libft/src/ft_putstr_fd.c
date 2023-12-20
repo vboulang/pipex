@@ -1,32 +1,36 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.h                                            :+:      :+:    :+:   */
+/*   ft_putstr_fd.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/01 14:34:08 by vboulang          #+#    #+#             */
-/*   Updated: 2023/12/20 14:25:11 by vboulang         ###   ########.fr       */
+/*   Created: 2023/10/19 15:25:54 by vboulang          #+#    #+#             */
+/*   Updated: 2023/12/20 14:15:55 by vboulang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PIPEX_H
-# define PIPEX_H
-# include <fcntl.h>
-# include <unistd.h>
-# include <stdio.h>
-# include <string.h>
-# include <sys/wait.h>
-# include "../libft/inc/libft.h"
+#include "../inc/libft.h"
 
-typedef struct s_cmd
+void	ft_putstr_fd(char *s, int fd)
 {
-	char	*path;
-	char	**cmd;
-	int		pnb;
-	int		fd[2];
-} t_cmd;
+	int	i;
 
-int	main(int argc, char **argv, char **envp);
+	i = 0;
+	if (!s)
+		return ;
+	while (s[i])
+	{
+		write(fd, &s[i], 1);
+		i++;
+	}
+}
+/*
+int main()
+{
+	char s[10] = "hamster 1";
+	char t[10] = "hamster 2";
 
-#endif
+	ft_putstr_fd(s, 1);
+	ft_putstr_fd(t, 2);
+}*/

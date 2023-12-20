@@ -1,32 +1,20 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.h                                            :+:      :+:    :+:   */
+/*   ft_isalnum.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/01 14:34:08 by vboulang          #+#    #+#             */
-/*   Updated: 2023/12/20 14:25:11 by vboulang         ###   ########.fr       */
+/*   Created: 2023/10/16 11:24:41 by vboulang          #+#    #+#             */
+/*   Updated: 2023/12/20 14:14:30 by vboulang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PIPEX_H
-# define PIPEX_H
-# include <fcntl.h>
-# include <unistd.h>
-# include <stdio.h>
-# include <string.h>
-# include <sys/wait.h>
-# include "../libft/inc/libft.h"
+#include "../inc/libft.h"
 
-typedef struct s_cmd
+int	ft_isalnum(int c)
 {
-	char	*path;
-	char	**cmd;
-	int		pnb;
-	int		fd[2];
-} t_cmd;
-
-int	main(int argc, char **argv, char **envp);
-
-#endif
+	if (ft_isalpha(c) || ft_isdigit(c))
+		return (1);
+	return (0);
+}

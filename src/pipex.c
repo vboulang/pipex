@@ -6,7 +6,7 @@
 /*   By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 14:34:12 by vboulang          #+#    #+#             */
-/*   Updated: 2023/12/19 14:49:56 by vboulang         ###   ########.fr       */
+/*   Updated: 2023/12/20 15:39:51 by vboulang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,7 +22,7 @@ char	*test_path(char **paths, char *str)
 	{
 		correct_path = ft_strjoin(paths[i], "/");
 		correct_path = ft_strjoin(correct_path, str);
-		if(access(correct_path, X_OK) == 0)
+		if (access(correct_path, X_OK) == 0)
 			return (correct_path);
 		else
 			free(correct_path);
@@ -52,7 +52,7 @@ char	*get_path(char **envp, char *str)
 	paths = ft_split(paths_to_split[1], ':');
 	correct_path = test_path(paths, str);
 	if (!correct_path)
-		return (NULL);//TODO message incorrect command
+		return (NULL);
 	else
 		return (correct_path);
 }
@@ -62,68 +62,79 @@ int	dupfct(int *fd, int fd_file, int nb)
 	if (nb == 0)
 	{
 		if (dup2(fd[1], STDOUT_FILENO) == -1)
-			return (-1); //TODO Make error message
+			return (-1);
 		if (dup2(fd_file, STDIN_FILENO) == -1)
-			return (-1); //TODO Make error message
+			return (-1);
 	}
 	else
 	{
 		if (dup2(fd_file, STDOUT_FILENO) == -1)
-			return (-1); //TODO Make error message
+			return (-1);
 		if (dup2(fd[0], STDIN_FILENO) == -1)
-			return (-1); //TODO Make error message
+			return (-1);
 	}
 	return (0);
 }
 
-int	to_open(int	pnb, char **argv)
+int	to_open(int pnb, char **argv)
 {
+	int	fd;
+
 	if (pnb == 0)
-		return(open(argv[1], O_RDONLY));
+		fd = open(argv[1], O_RDONLY);
 	else
-		return(open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0666));
+		fd = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0666);
+	return (fd);
+}
+
+void	free_all(t_cmd cmd)
+{
+	free(cmd.cmd);
+	cmd.cmd = NULL;
+	free(cmd.path);
+	cmd.path = NULL;
 }
 
 void	child(t_cmd cmd, char **argv, char **envp)
-{	
+{
 	int	fd_file;
-	
+
 	fd_file = to_open(cmd.pnb, argv);
 	if (fd_file == -1)
-		return (printf("open failed")); //TODO Make error message
+		perror("File cannot be opened ");
 	if (dupfct(cmd.fd, fd_file, cmd.pnb) == -1)
-		return (printf("failed dup")); //TODO Make error message and change if comparison to match error returned
+		perror("Problems with files ");
 	close(cmd.fd[0]);
 	close(cmd.fd[1]);
 	close(fd_file);
 	cmd.cmd = ft_split(argv[cmd.pnb + 2], ' ');
 	cmd.path = get_path(envp, cmd.cmd[0]);
 	if (!cmd.path)
-		return(printf("command not found")); //TODO Make an error message
+		perror("Command not found ");
 	execve(cmd.path, cmd.cmd, NULL);
-	perror("failed command"); //TODO Make an error message and free cmd.cmd and cmd.path
-	exit();
+	perror("Execution failed ");
+	free_all(cmd);
+	exit(0);
 }
 
-int	pipex(t_cmd cmd, int n, char **argv, char **envp)
+void	pipex(t_cmd cmd, int n, char **argv, char **envp)
 {
-	int	id;
+	int	pid;
+	// int	status;
 
 	pipe(cmd.fd);
-	while(cmd.pnb < n)
+	while (cmd.pnb < n)
 	{
-		id = fork();
-		if (id == -1)
-			return (printf("fork failed")); //TODO Make error message
-		if (id == 0)
+		pid = fork();
+		if (pid == -1)
+			perror("Fork failed");
+		if (pid == 0)
 		{
 			child(cmd, argv, envp);
 		}
-		// else
-		// 	waitpid();
+		// waitpid(pid, &status, 0);
 		cmd.pnb += 1;
 	}
-	return (0); //TO REMOVE?
 }
 
 int	main(int argc, char **argv, char **envp)
@@ -134,7 +145,7 @@ int	main(int argc, char **argv, char **envp)
 	{
 		cmd.pnb = 0;
 		if (access(argv[1], R_OK) == -1)
-			return (0); //TODO Make error message
+			perror("Can't open file ");
 		pipex(cmd, argc - 3, argv, envp);
 	}
 	else

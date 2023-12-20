@@ -1,32 +1,31 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.h                                            :+:      :+:    :+:   */
+/*   ft_lstclear.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/01 14:34:08 by vboulang          #+#    #+#             */
-/*   Updated: 2023/12/20 14:25:11 by vboulang         ###   ########.fr       */
+/*   Created: 2023/10/25 12:39:00 by vboulang          #+#    #+#             */
+/*   Updated: 2023/12/20 14:14:50 by vboulang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PIPEX_H
-# define PIPEX_H
-# include <fcntl.h>
-# include <unistd.h>
-# include <stdio.h>
-# include <string.h>
-# include <sys/wait.h>
-# include "../libft/inc/libft.h"
+#include "../inc/libft.h"
 
-typedef struct s_cmd
+void	ft_lstclear(t_list **lst, void (*del)(void *))
 {
-	char	*path;
-	char	**cmd;
-	int		pnb;
-	int		fd[2];
-} t_cmd;
+	t_list	*temp;
+	t_list	*list;
 
-int	main(int argc, char **argv, char **envp);
-
-#endif
+	if (!lst || !del)
+		return ;
+	list = *lst;
+	while (list)
+	{
+		temp = list->next;
+		ft_lstdelone(list, del);
+		list = temp;
+	}
+	free(list);
+	*lst = NULL;
+}

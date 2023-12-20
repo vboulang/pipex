@@ -1,32 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.h                                            :+:      :+:    :+:   */
+/*   ft_lstiter.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/01 14:34:08 by vboulang          #+#    #+#             */
-/*   Updated: 2023/12/20 14:25:11 by vboulang         ###   ########.fr       */
+/*   Created: 2023/10/25 15:44:57 by vboulang          #+#    #+#             */
+/*   Updated: 2023/12/20 14:14:58 by vboulang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PIPEX_H
-# define PIPEX_H
-# include <fcntl.h>
-# include <unistd.h>
-# include <stdio.h>
-# include <string.h>
-# include <sys/wait.h>
-# include "../libft/inc/libft.h"
+#include "../inc/libft.h"
 
-typedef struct s_cmd
+void	ft_lstiter(t_list *lst, void (*f)(void*))
 {
-	char	*path;
-	char	**cmd;
-	int		pnb;
-	int		fd[2];
-} t_cmd;
+	t_list	*tmp;
 
-int	main(int argc, char **argv, char **envp);
-
-#endif
+	if (!lst || !f)
+		return ;
+	tmp = lst;
+	while (tmp)
+	{
+		f(tmp->content);
+		tmp = tmp->next;
+	}
+}

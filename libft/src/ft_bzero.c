@@ -1,32 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   pipex.h                                            :+:      :+:    :+:   */
+/*   ft_bzero.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2023/12/01 14:34:08 by vboulang          #+#    #+#             */
-/*   Updated: 2023/12/20 14:25:11 by vboulang         ###   ########.fr       */
+/*   Created: 2023/10/17 13:15:56 by vboulang          #+#    #+#             */
+/*   Updated: 2023/12/20 14:14:24 by vboulang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#ifndef PIPEX_H
-# define PIPEX_H
-# include <fcntl.h>
-# include <unistd.h>
-# include <stdio.h>
-# include <string.h>
-# include <sys/wait.h>
-# include "../libft/inc/libft.h"
+#include "../inc/libft.h"
 
-typedef struct s_cmd
+void	ft_bzero(void *s, size_t n)
 {
-	char	*path;
-	char	**cmd;
-	int		pnb;
-	int		fd[2];
-} t_cmd;
+	unsigned int	i;
+	char			*b;
 
-int	main(int argc, char **argv, char **envp);
-
-#endif
+	i = 0;
+	b = s;
+	if (!b)
+		return ;
+	if (n > 0)
+	{
+		while (i < n)
+		{
+			b[i] = '\0';
+			i++;
+		}
+	}
+}

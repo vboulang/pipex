@@ -6,13 +6,19 @@
 #    By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/10/17 10:38:43 by vboulang          #+#    #+#              #
-#    Updated: 2023/12/06 13:33:46 by vboulang         ###   ########.fr        #
+#    Updated: 2023/12/20 16:55:36 by vboulang         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-
+#Program names
 NAME = libft.a
 
+#Directories
+SRCDIR		=	src
+INCDIR		=	inc
+OBJDIR		=	obj
+
+#Source files
 SRC = \
 	ft_isalpha.c \
 	ft_isdigit.c \
@@ -49,6 +55,7 @@ SRC = \
 	ft_putendl_fd.c \
 	ft_putnbr_fd.c
 
+#Source files for bonus
 SRC_BONUS = \
 			ft_lstnew.c \
 			ft_lstadd_front.c \
@@ -60,34 +67,45 @@ SRC_BONUS = \
 			ft_lstiter.c \
 			ft_lstmap.c
 
-OBJ = $(SRC:.c=.o)
+VPATH		=	$(SRCDIR)
 
-OBJ_BONUS = $(SRC_BONUS:.c=.o)
+#Object files
+OBJ	= $(addprefix $(OBJDIR)/,$(SRC:%.c=%.o))
+OBJ_BONUS = $(addprefix $(OBJDIR)/,$(SRC_BONUS:%.c=%.o))
 
+#Archive variables
 AR = ar
 
+#Compiling variables
 CC = gcc
-
 CFLAGS = -Wall -Werror -Wextra #-fsanitize=address
 
-RM = rm -f
+#.h files name
+INC	= $(INCDIR)/libft.h
+
+#Command lines
+RM = rm -rf
+MK = mkdir -p
 
 all: $(NAME)
 
+$(OBJDIR):
+	$(MK) $(OBJDIR)
+
+$(OBJDIR)/%.o: %.c #$(INC)
+	$(CC) $(CFLAGS) -c -o $@ $<
+
 $(NAME):	$(OBJ)
-	@$(AR) -r $(NAME) $?
+	$(AR) -rcs $(NAME) $^
 
-%.o: %.c
-	@$(CC) -c $(CFLAGS) $?
-
-bonus: $(OBJ) $(OBJ_BONUS)
+bonus: $(OBJDIR) $(OBJ) $(OBJ_BONUS)
 	$(AR) -r $(NAME) $?
 
 clean:
-	@$(RM) $(OBJ) $(OBJ_BONUS) 
+	$(RM) $(OBJDIR)
 
 fclean: clean
-	@$(RM) $(NAME)
+	$(RM) $(NAME)
 
 re: fclean all
 
