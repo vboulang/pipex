@@ -6,7 +6,7 @@
 #    By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/10/17 10:38:43 by vboulang          #+#    #+#              #
-#    Updated: 2023/12/20 16:55:36 by vboulang         ###   ########.fr        #
+#    Updated: 2023/12/21 16:53:56 by vboulang         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -95,8 +95,9 @@ $(OBJDIR):
 $(OBJDIR)/%.o: %.c #$(INC)
 	$(CC) $(CFLAGS) -c -o $@ $<
 
-$(NAME):	$(OBJ)
-	$(AR) -rcs $(NAME) $^
+$(NAME):	$(OBJDIR) $(OBJ)
+	$(AR) -rcs $(NAME) $(OBJ)
+
 
 bonus: $(OBJDIR) $(OBJ) $(OBJ_BONUS)
 	$(AR) -r $(NAME) $?

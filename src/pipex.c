@@ -6,7 +6,7 @@
 /*   By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 14:34:12 by vboulang          #+#    #+#             */
-/*   Updated: 2023/12/20 15:39:51 by vboulang         ###   ########.fr       */
+/*   Updated: 2023/12/21 17:07:16 by vboulang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,6 +68,7 @@ int	dupfct(int *fd, int fd_file, int nb)
 	}
 	else
 	{
+		dprintf(1, "hey");
 		if (dup2(fd_file, STDOUT_FILENO) == -1)
 			return (-1);
 		if (dup2(fd[0], STDIN_FILENO) == -1)
@@ -99,6 +100,7 @@ void	child(t_cmd cmd, char **argv, char **envp)
 {
 	int	fd_file;
 
+	printf("Hello");
 	fd_file = to_open(cmd.pnb, argv);
 	if (fd_file == -1)
 		perror("File cannot be opened ");
@@ -120,7 +122,7 @@ void	child(t_cmd cmd, char **argv, char **envp)
 void	pipex(t_cmd cmd, int n, char **argv, char **envp)
 {
 	int	pid;
-	// int	status;
+	int	status;
 
 	pipe(cmd.fd);
 	while (cmd.pnb < n)
@@ -132,7 +134,9 @@ void	pipex(t_cmd cmd, int n, char **argv, char **envp)
 		{
 			child(cmd, argv, envp);
 		}
-		// waitpid(pid, &status, 0);
+
+		waitpid(pid, &status, 0);
+		dprintf(1, "lol:");
 		cmd.pnb += 1;
 	}
 }
