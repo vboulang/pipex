@@ -6,7 +6,7 @@
 /*   By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 14:34:12 by vboulang          #+#    #+#             */
-/*   Updated: 2023/12/21 17:07:16 by vboulang         ###   ########.fr       */
+/*   Updated: 2023/12/22 15:36:06 by vboulang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -131,10 +131,7 @@ void	pipex(t_cmd cmd, int n, char **argv, char **envp)
 		if (pid == -1)
 			perror("Fork failed");
 		if (pid == 0)
-		{
 			child(cmd, argv, envp);
-		}
-
 		waitpid(pid, &status, 0);
 		dprintf(1, "lol:");
 		cmd.pnb += 1;
@@ -151,6 +148,7 @@ int	main(int argc, char **argv, char **envp)
 		if (access(argv[1], R_OK) == -1)
 			perror("Can't open file ");
 		pipex(cmd, argc - 3, argv, envp);
+		free_all(cmd);
 	}
 	else
 		return (printf("Nope\n")); //TODO Make error message
