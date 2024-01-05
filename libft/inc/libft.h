@@ -6,7 +6,7 @@
 /*   By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/10/16 11:39:24 by vboulang          #+#    #+#             */
-/*   Updated: 2023/11/01 14:17:23 by vboulang         ###   ########.fr       */
+/*   Updated: 2024/01/05 14:30:31 by vboulang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,6 +14,10 @@
 # define LIBFT_H
 # include <unistd.h>
 # include <stdlib.h>
+
+# ifndef BUFFER_SIZE
+#  define BUFFER_SIZE 42
+# endif
 
 typedef struct s_list
 {
@@ -65,4 +69,10 @@ void	ft_lstclear(t_list **lst, void (*del)(void *));
 void	ft_lstiter(t_list *lst, void (*f)(void *));
 t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
 
+char	*get_next_line(int fd);
+char	*ft_strjoin_gnl(char *s1, char const *s2);
+char	*ft_to_return(char *str, char *reste);
+int		read_one_line(char **check, int fd, char **new_string, char *buff);
+char	*initialize(char *buff);
+char	*check_size_read(int size_read,	char **new_string);
 #endif
