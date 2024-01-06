@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: vincent <vincent@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 14:34:12 by vboulang          #+#    #+#             */
-/*   Updated: 2024/01/05 16:07:24 by vboulang         ###   ########.fr       */
+/*   Updated: 2024/01/06 16:45:19 by vincent          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/pipex.h"
 
-char	*test_path(char **paths, char *str)
+char *test_path(char **paths, char *str)
 {
-	int		i;
-	char	*correct_path;
+	int i;
+	char *correct_path;
 
 	i = 0;
 	while (paths[i])
@@ -31,13 +31,13 @@ char	*test_path(char **paths, char *str)
 	return (NULL);
 }
 
-char	*get_path(char **envp, char *str)
+char *get_path(char **envp, char *str)
 {
-	int		i;
-	int		path_not_found;
-	char	**paths_to_split;
-	char	**paths;
-	char	*correct_path;
+	int i;
+	int path_not_found;
+	char **paths_to_split;
+	char **paths;
+	char *correct_path;
 
 	i = 0;
 	path_not_found = 1;
@@ -57,7 +57,7 @@ char	*get_path(char **envp, char *str)
 		return (correct_path);
 }
 
-int	dupfct(int *fd, int fd_file, int nb)
+int dupfct(int *fd, int fd_file, int nb)
 {
 	if (nb == 0)
 	{
@@ -76,9 +76,9 @@ int	dupfct(int *fd, int fd_file, int nb)
 	return (0);
 }
 
-int	to_open(int pnb, char **argv)
+int to_open(int pnb, char **argv)
 {
-	int	fd;
+	int fd;
 
 	if (pnb == 0)
 		fd = open(argv[1], O_RDONLY);
@@ -87,9 +87,9 @@ int	to_open(int pnb, char **argv)
 	return (fd);
 }
 
-void	free_all(t_cmd cmd)
+void free_all(t_cmd cmd)
 {
-	if(cmd.cmd)
+	if (cmd.cmd)
 	{
 		free(cmd.cmd);
 		cmd.cmd = NULL;
@@ -101,9 +101,9 @@ void	free_all(t_cmd cmd)
 	}
 }
 
-void	child(t_cmd cmd, char **argv, char **envp)
+void child(t_cmd cmd, char **argv, char **envp)
 {
-	int	fd_file;
+	int fd_file;
 
 	fd_file = to_open(cmd.pnb, argv);
 	if (fd_file == -1)
@@ -123,10 +123,10 @@ void	child(t_cmd cmd, char **argv, char **envp)
 	exit(0);
 }
 
-void	pipex(t_cmd cmd, int n, char **argv, char **envp)
+void pipex(t_cmd cmd, int n, char **argv, char **envp)
 {
-	int	pid;
-	int	status;
+	int pid;
+	int status;
 
 	pipe(cmd.fd);
 	while (cmd.pnb < n)
@@ -136,7 +136,7 @@ void	pipex(t_cmd cmd, int n, char **argv, char **envp)
 			perror("Fork failed.");
 		if (pid == 0)
 			child(cmd, argv, envp);
-		if(cmd.pnb == 1)
+		if (cmd.pnb == 1)
 		{
 			close(cmd.fd[0]);
 			close(cmd.fd[1]);
@@ -146,17 +146,32 @@ void	pipex(t_cmd cmd, int n, char **argv, char **envp)
 	}
 }
 
-int	main(int argc, char **argv, char **envp)
+void	read_input(char *limiter)
 {
-	t_cmd	cmd;
+	char	*str;
+
+	str=NULL;
+	while(ft_strncmp(str, "limiter", ft_strlen(limiter)))
+		get_next_line(0);
+}
+
+int main(int argc, char **argv, char **envp)
+{
+	t_cmd cmd;
+	char str;
 
 	if (argc >= 5)
 	{
 		cmd.pnb = 0;
-		if (access(argv[1], R_OK) == -1)
-			perror("Can't open file. ");
-		pipex(cmd, argc - 3, argv, envp);
-		free_all(cmd);
+		if (ft_strncmp(argv[1], "here_doc", 8) == 0)
+			read_imput(argv[2]);
+		else
+		{
+			if (access(argv[1], R_OK) == -1)
+				perror("Can't open file. ");
+			pipex(cmd, argc - 3, argv, envp);
+			free_all(cmd);
+		}
 	}
 	else
 		return (printf("Wrong number of argument.\n"));
