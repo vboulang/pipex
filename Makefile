@@ -6,29 +6,31 @@
 #    By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/12/01 14:34:28 by vboulang          #+#    #+#              #
-#    Updated: 2023/12/21 16:33:46 by vboulang         ###   ########.fr        #
+#    Updated: 2024/01/09 15:16:05 by vboulang         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 #Program names
 NAME		=	pipex
+NAME_BONUS	=	pipex_bonus
 
 #Compiling variables
 CC			=	gcc
 CFLAGS		=	-Wall -Werror -Wextra -g #-fsanitize=address
-LIBFLAGS	=	-L. -I. -lftprintf
 
 #Directories
-LIBDIR		=	libft
-SRCDIR		=	src
-INCDIR		=	inc
-OBJDIR		=	obj
+LIBDIR			=	libft
+SRCDIR			=	src
+INCDIR			=	inc
+OBJDIR			=	obj
+SRCDIR_BONUS	=	bonus
 
 #Library names
 LIBFT		=	$(LIBDIR)/libft.a
 
 #.h files name
 INC			=	$(INCDIR)/pipex.h
+INC_BONUS	=	$(INCDIR)/pipex_bonus.h
 
 #Command lines
 RM			=	rm -rf
@@ -38,10 +40,13 @@ MK			=	mkdir -p
 
 SRC			= 	pipex.c 
 
-VPATH		=	$(SRCDIR)
+SRC_BONUS	=	pipex_bonus.c
+
+VPATH		=	$(SRCDIR) $(SRCDIR_BONUS)
 
 #Object files
 OBJ			=	$(addprefix $(OBJDIR)/,$(SRC:%.c=%.o))
+OBJ_BONUS	=	$(addprefix $(OBJDIR)/,$(SRC_BONUS:%.c=%.o))
 
 all: $(NAME)
 
@@ -55,12 +60,21 @@ $(OBJDIR)/%.o: %.c $(INC)
 $(OBJDIR):
 	$(MK) $(OBJDIR)
 
+bonus: $(NAME_BONUS)
+
+$(NAME_BONUS):	$(OBJDIR) $(OBJ_BONUS)
+	make -C $(LIBDIR)
+	$(CC) $(CFLAGS) $(OBJ_BONUS) $(LIBFT) -o $(NAME_BONUS)
+
+$(OBJDIR)/%.o: %.c $(INC_BONUS)
+	$(CC) $(CFLAGS) -I$(INC_BONUS) -I$(LIBDIR)/inc/libft.h -c $< -o $@
+	
 clean:
 	$(RM) $(OBJDIR)
 	make -C $(LIBDIR) clean
 
 fclean: clean
-	$(RM) $(NAME)
+	$(RM) $(NAME) $(NAME_BONUS)
 	make -C $(LIBDIR) fclean
 
 re: fclean all

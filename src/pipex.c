@@ -6,7 +6,7 @@
 /*   By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 14:34:12 by vboulang          #+#    #+#             */
-/*   Updated: 2024/01/05 15:29:39 by vboulang         ###   ########.fr       */
+/*   Updated: 2024/01/09 14:18:50 by vboulang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -89,7 +89,7 @@ int	to_open(int pnb, char **argv)
 
 void	free_all(t_cmd cmd)
 {
-	if(cmd.cmd)
+	if (cmd.cmd)
 	{
 		free(cmd.cmd);
 		cmd.cmd = NULL;
@@ -136,7 +136,7 @@ void	pipex(t_cmd cmd, int n, char **argv, char **envp)
 			perror("Fork failed.");
 		if (pid == 0)
 			child(cmd, argv, envp);
-		if(cmd.pnb == 1)
+		if (cmd.pnb == 1)
 		{
 			close(cmd.fd[0]);
 			close(cmd.fd[1]);

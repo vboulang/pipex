@@ -3,19 +3,19 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vincent <vincent@student.42.fr>            +#+  +:+       +#+        */
+/*   By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 14:34:12 by vboulang          #+#    #+#             */
-/*   Updated: 2024/01/06 16:45:19 by vincent          ###   ########.fr       */
+/*   Updated: 2024/01/09 15:25:38 by vboulang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../inc/pipex.h"
+#include "../inc/pipex_bonus.h"
 
-char *test_path(char **paths, char *str)
+char	*test_path(char **paths, char *str)
 {
-	int i;
-	char *correct_path;
+	int		i;
+	char	*correct_path;
 
 	i = 0;
 	while (paths[i])
@@ -31,13 +31,13 @@ char *test_path(char **paths, char *str)
 	return (NULL);
 }
 
-char *get_path(char **envp, char *str)
+char	*get_path(char **envp, char *str)
 {
-	int i;
-	int path_not_found;
-	char **paths_to_split;
-	char **paths;
-	char *correct_path;
+	int		i;
+	int		path_not_found;
+	char	**paths_to_split;
+	char	**paths;
+	char	*correct_path;
 
 	i = 0;
 	path_not_found = 1;
@@ -57,7 +57,7 @@ char *get_path(char **envp, char *str)
 		return (correct_path);
 }
 
-int dupfct(int *fd, int fd_file, int nb)
+int	dupfct(int *fd, int fd_file, int nb)
 {
 	if (nb == 0)
 	{
@@ -76,18 +76,19 @@ int dupfct(int *fd, int fd_file, int nb)
 	return (0);
 }
 
-int to_open(int pnb, char **argv)
+int	to_open(t_cmd cmd, char **argv)
 {
-	int fd;
+	int	fd;
 
-	if (pnb == 0)
+	if (cmd.pnb == 0)
 		fd = open(argv[1], O_RDONLY);
 	else
-		fd = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0666);
+		fd = open(argv[cmd.max + 3], O_WRONLY | O_CREAT | O_TRUNC, 0666);
+	dprintf(2, "%s", argv[cmd.max]);
 	return (fd);
 }
 
-void free_all(t_cmd cmd)
+void	free_all(t_cmd cmd)
 {
 	if (cmd.cmd)
 	{
@@ -101,18 +102,27 @@ void free_all(t_cmd cmd)
 	}
 }
 
-void child(t_cmd cmd, char **argv, char **envp)
+void	child(t_cmd cmd, char **argv, char **envp)
 {
-	int fd_file;
+	int	fd_file;
 
-	fd_file = to_open(cmd.pnb, argv);
-	if (fd_file == -1)
-		perror("File cannot be opened. ");
-	if (dupfct(cmd.fd, fd_file, cmd.pnb) == -1)
-		perror("Problems with files. ");
+	if (cmd.pnb == cmd.max)
+	{
+		dprintf(2, "outfile\n");
+		fd_file = to_open(cmd, argv);
+		if (fd_file == -1)
+			perror("File cannot be opened. ");
+		else if (dup2(fd_file, STDOUT_FILENO) == -1)
+			perror("Problems with files. ");
+		close(fd_file);
+	}
+	else
+	{
+		if (dup2(cmd.fd[1], STDOUT_FILENO) == -1)
+			perror("Problems with files. ");
+	}
 	close(cmd.fd[0]);
 	close(cmd.fd[1]);
-	close(fd_file);
 	cmd.cmd = ft_split(argv[cmd.pnb + 2], ' ');
 	cmd.path = get_path(envp, cmd.cmd[0]);
 	if (!cmd.path)
@@ -123,55 +133,59 @@ void child(t_cmd cmd, char **argv, char **envp)
 	exit(0);
 }
 
-void pipex(t_cmd cmd, int n, char **argv, char **envp)
+int	change_parent_input(int fd_file)
 {
-	int pid;
-	int status;
+	if (dup2(fd_file, STDIN_FILENO) == -1)
+		return (-1);
+	close(fd_file);
+	return (0);
+}
 
-	pipe(cmd.fd);
-	while (cmd.pnb < n)
+void	pipex(t_cmd cmd, char **argv, char **envp)
+{
+	int	pid;
+	int	status;
+	int	fd_file;
+	
+	fd_file = to_open(cmd, argv);
+	if (fd_file == -1)
+		perror("File cannot be opened. ");
+	if(change_parent_input(fd_file) == -1)
+		perror("Problems with files. ");
+	while (cmd.pnb <= cmd.max)
 	{
+		pipe(cmd.fd);
 		pid = fork();
 		if (pid == -1)
-			perror("Fork failed.");
-		if (pid == 0)
-			child(cmd, argv, envp);
-		if (cmd.pnb == 1)
 		{
+			perror("Fork failed.");
 			close(cmd.fd[0]);
-			close(cmd.fd[1]);
 		}
+		if (pid == 0)
+		{
+			dprintf(2, "child\n");
+			child(cmd, argv, envp);
+		}
+		else
+			change_parent_input(cmd.fd[0]);
+		close(cmd.fd[1]);
 		waitpid(pid, &status, 0);
 		cmd.pnb += 1;
 	}
 }
 
-void	read_input(char *limiter)
+int	main(int argc, char **argv, char **envp)
 {
-	char	*str;
-
-	str=NULL;
-	while(ft_strncmp(str, "limiter", ft_strlen(limiter)))
-		get_next_line(0);
-}
-
-int main(int argc, char **argv, char **envp)
-{
-	t_cmd cmd;
-	char str;
+	t_cmd	cmd;
 
 	if (argc >= 5)
 	{
 		cmd.pnb = 0;
-		if (ft_strncmp(argv[1], "here_doc", 8) == 0)
-			read_imput(argv[2]);
-		else
-		{
-			if (access(argv[1], R_OK) == -1)
-				perror("Can't open file. ");
-			pipex(cmd, argc - 3, argv, envp);
-			free_all(cmd);
-		}
+		cmd.max = argc - 4;
+		if (access(argv[1], R_OK) == -1)
+			perror("Can't open file. ");
+		pipex(cmd, argv, envp);
+		free_all(cmd);
 	}
 	else
 		return (printf("Wrong number of argument.\n"));
