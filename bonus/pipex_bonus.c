@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   pipex_bonus.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+        */
+/*   By: vincent <vincent@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 14:34:12 by vboulang          #+#    #+#             */
-/*   Updated: 2024/01/09 15:25:38 by vboulang         ###   ########.fr       */
+/*   Updated: 2024/01/10 16:45:26 by vincent          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,14 +84,22 @@ int	to_open(t_cmd cmd, char **argv)
 		fd = open(argv[1], O_RDONLY);
 	else
 		fd = open(argv[cmd.max + 3], O_WRONLY | O_CREAT | O_TRUNC, 0666);
-	dprintf(2, "%s", argv[cmd.max]);
 	return (fd);
 }
 
 void	free_all(t_cmd cmd)
 {
+	int	i;
+	
 	if (cmd.cmd)
 	{
+		i = 0;
+		while(cmd.cmd[i])
+		{
+			free(cmd.cmd[i]);
+			cmd.cmd[i] = NULL;
+			i++;
+		}
 		free(cmd.cmd);
 		cmd.cmd = NULL;
 	}
@@ -108,7 +116,6 @@ void	child(t_cmd cmd, char **argv, char **envp)
 
 	if (cmd.pnb == cmd.max)
 	{
-		dprintf(2, "outfile\n");
 		fd_file = to_open(cmd, argv);
 		if (fd_file == -1)
 			perror("File cannot be opened. ");
@@ -152,8 +159,9 @@ void	pipex(t_cmd cmd, char **argv, char **envp)
 		perror("File cannot be opened. ");
 	if(change_parent_input(fd_file) == -1)
 		perror("Problems with files. ");
-	while (cmd.pnb <= cmd.max)
+	while (cmd.pnb++ <= cmd.max)
 	{
+		dprintf(2, "%i", cmd.pnb);
 		pipe(cmd.fd);
 		pid = fork();
 		if (pid == -1)
@@ -162,16 +170,22 @@ void	pipex(t_cmd cmd, char **argv, char **envp)
 			close(cmd.fd[0]);
 		}
 		if (pid == 0)
-		{
-			dprintf(2, "child\n");
 			child(cmd, argv, envp);
-		}
 		else
 			change_parent_input(cmd.fd[0]);
 		close(cmd.fd[1]);
 		waitpid(pid, &status, 0);
-		cmd.pnb += 1;
+		//cmd.pnb += 1;
 	}
+}
+
+void	initialize_struct(t_cmd *cmd, int argc)
+{
+	cmd->pnb = -1;
+	cmd->max = argc - 4;
+	cmd->cmd = NULL;
+	cmd->path = NULL;
+	
 }
 
 int	main(int argc, char **argv, char **envp)
@@ -180,12 +194,10 @@ int	main(int argc, char **argv, char **envp)
 
 	if (argc >= 5)
 	{
-		cmd.pnb = 0;
-		cmd.max = argc - 4;
+		initialize_struct(&cmd, argc);
 		if (access(argv[1], R_OK) == -1)
 			perror("Can't open file. ");
 		pipex(cmd, argv, envp);
-		free_all(cmd);
 	}
 	else
 		return (printf("Wrong number of argument.\n"));

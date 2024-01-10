@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+         #
+#    By: vincent <vincent@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/12/01 14:34:28 by vboulang          #+#    #+#              #
-#    Updated: 2024/01/09 15:16:05 by vboulang         ###   ########.fr        #
+#    Updated: 2024/01/10 15:38:12 by vincent          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -55,7 +55,7 @@ $(NAME):	$(OBJDIR) $(OBJ)
 	$(CC) $(CFLAGS) $(OBJ) $(LIBFT) -o $(NAME)
 
 $(OBJDIR)/%.o: %.c $(INC)
-	$(CC) $(CFLAGS) -I$(INC) -I$(LIBDIR)/inc/libft.h -c $< -o $@
+	$(CC) $(CFLAGS) -I$(INCDIR) -I$(LIBDIR)/inc -c $< -o $@
 
 $(OBJDIR):
 	$(MK) $(OBJDIR)
@@ -67,7 +67,7 @@ $(NAME_BONUS):	$(OBJDIR) $(OBJ_BONUS)
 	$(CC) $(CFLAGS) $(OBJ_BONUS) $(LIBFT) -o $(NAME_BONUS)
 
 $(OBJDIR)/%.o: %.c $(INC_BONUS)
-	$(CC) $(CFLAGS) -I$(INC_BONUS) -I$(LIBDIR)/inc/libft.h -c $< -o $@
+	$(CC) $(CFLAGS) -I$(INCDIR) -I$(LIBDIR)/inc -c $< -o $@
 	
 clean:
 	$(RM) $(OBJDIR)
