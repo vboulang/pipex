@@ -3,10 +3,10 @@
 #                                                         :::      ::::::::    #
 #    Makefile                                           :+:      :+:    :+:    #
 #                                                     +:+ +:+         +:+      #
-#    By: vincent <vincent@student.42.fr>            +#+  +:+       +#+         #
+#    By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2023/12/01 14:34:28 by vboulang          #+#    #+#              #
-#    Updated: 2024/01/10 15:38:12 by vincent          ###   ########.fr        #
+#    Updated: 2024/01/11 14:34:42 by vboulang         ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -38,9 +38,15 @@ MK			=	mkdir -p
 
 #Source files
 
-SRC			= 	pipex.c 
+SRC			= 	pipex.c \
+				path.c \
+				cmd_struct.c \
+				file_handling.c
 
-SRC_BONUS	=	pipex_bonus.c
+SRC_BONUS	=	pipex_bonus.c \
+				path_bonus.c \
+				cmd_struct_bonus.c \
+				file_handling_bonus.c
 
 VPATH		=	$(SRCDIR) $(SRCDIR_BONUS)
 

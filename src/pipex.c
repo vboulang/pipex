@@ -6,144 +6,92 @@
 /*   By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 14:34:12 by vboulang          #+#    #+#             */
-/*   Updated: 2024/01/09 14:18:50 by vboulang         ###   ########.fr       */
+/*   Updated: 2024/01/11 16:48:45 by vboulang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/pipex.h"
 
-char	*test_path(char **paths, char *str)
+void	execution(t_cmd cmd, char **argv, char **envp)
 {
-	int		i;
-	char	*correct_path;
-
-	i = 0;
-	while (paths[i])
-	{
-		correct_path = ft_strjoin(paths[i], "/");
-		correct_path = ft_strjoin(correct_path, str);
-		if (access(correct_path, X_OK) == 0)
-			return (correct_path);
-		else
-			free(correct_path);
-		i++;
-	}
-	return (NULL);
-}
-
-char	*get_path(char **envp, char *str)
-{
-	int		i;
-	int		path_not_found;
-	char	**paths_to_split;
-	char	**paths;
-	char	*correct_path;
-
-	i = 0;
-	path_not_found = 1;
-	while (envp[i] && path_not_found)
-	{
-		if (!ft_strnstr(envp[i], "PATH", 4))
-			i++;
-		else
-			path_not_found = 0;
-	}
-	paths_to_split = ft_split(envp[i], '=');
-	paths = ft_split(paths_to_split[1], ':');
-	correct_path = test_path(paths, str);
-	if (!correct_path)
-		return (NULL);
-	else
-		return (correct_path);
-}
-
-int	dupfct(int *fd, int fd_file, int nb)
-{
-	if (nb == 0)
-	{
-		if (dup2(fd[1], STDOUT_FILENO) == -1)
-			return (-1);
-		if (dup2(fd_file, STDIN_FILENO) == -1)
-			return (-1);
-	}
-	else
-	{
-		if (dup2(fd_file, STDOUT_FILENO) == -1)
-			return (-1);
-		if (dup2(fd[0], STDIN_FILENO) == -1)
-			return (-1);
-	}
-	return (0);
-}
-
-int	to_open(int pnb, char **argv)
-{
-	int	fd;
-
-	if (pnb == 0)
-		fd = open(argv[1], O_RDONLY);
-	else
-		fd = open(argv[4], O_WRONLY | O_CREAT | O_TRUNC, 0666);
-	return (fd);
-}
-
-void	free_all(t_cmd cmd)
-{
-	if (cmd.cmd)
-	{
-		free(cmd.cmd);
-		cmd.cmd = NULL;
-	}
-	if (cmd.path)
-	{
-		free(cmd.path);
-		cmd.path = NULL;
-	}
+	cmd.cmd = ft_split(argv[cmd.pnb + 2], ' ');
+	cmd.path = get_path(envp, cmd.cmd[0]);
+	if (!cmd.path)
+		perror("Unable to find path for command. ");
+	execve(cmd.path, cmd.cmd, NULL);
+	perror("Execution failed. ");
+	free_all(cmd);
+	exit(EXIT_FAILURE);
 }
 
 void	child(t_cmd cmd, char **argv, char **envp)
 {
 	int	fd_file;
 
-	fd_file = to_open(cmd.pnb, argv);
-	if (fd_file == -1)
-		perror("File cannot be opened. ");
-	if (dupfct(cmd.fd, fd_file, cmd.pnb) == -1)
-		perror("Problems with files. ");
+	if (cmd.pnb == 1)
+	{
+		fd_file = to_open(cmd, argv);
+		if (fd_file == -1)
+		{
+			perror("Failed to open output file. ");
+			close(fd_file);
+			close(cmd.fd[0]);
+			close(cmd.fd[1]);
+			exit(EXIT_FAILURE);
+		}
+		else if (dup2(fd_file, STDOUT_FILENO) == -1)
+			perror("Could not change output file descriptor. ");
+		close(fd_file);
+	}
+	else
+	{
+		if (dup2(cmd.fd[1], STDOUT_FILENO) == -1)
+			perror("Could not change output file descriptor. ");
+	}
 	close(cmd.fd[0]);
 	close(cmd.fd[1]);
-	close(fd_file);
-	cmd.cmd = ft_split(argv[cmd.pnb + 2], ' ');
-	cmd.path = get_path(envp, cmd.cmd[0]);
-	if (!cmd.path)
-		perror("Command not found. ");
-	execve(cmd.path, cmd.cmd, NULL);
-	perror("Execution failed. ");
-	free_all(cmd);
-	exit(0);
+	execution(cmd, argv, envp);
 }
 
-void	pipex(t_cmd cmd, int n, char **argv, char **envp)
+void	to_execute(t_cmd cmd, char **argv, char **envp)
 {
 	int	pid;
 	int	status;
 
-	pipe(cmd.fd);
-	while (cmd.pnb < n)
+	while (cmd.pnb <= 1)
 	{
+		pipe(cmd.fd);
 		pid = fork();
 		if (pid == -1)
-			perror("Fork failed.");
+		{
+			perror("Unable to create child process.");
+			close(cmd.fd[0]);
+		}
 		if (pid == 0)
 			child(cmd, argv, envp);
-		if (cmd.pnb == 1)
+		else
 		{
-			close(cmd.fd[0]);
-			close(cmd.fd[1]);
+			if (change_parent_input(cmd.fd[0]) == -1)
+				perror("Could not change input file descriptor. ");
 		}
+		close(cmd.fd[1]);
 		waitpid(pid, &status, 0);
+		if (WEXITSTATUS(status) == 1)
+			free_and_exit(cmd, status);
 		cmd.pnb += 1;
 	}
+}
+
+void	pipex(t_cmd cmd, char **argv, char **envp)
+{
+	int	fd_file;
+
+	fd_file = to_open(cmd, argv);
+	if (fd_file == -1)
+		perror("Failed to open file. ");
+	if (change_parent_input(fd_file) == -1)
+		perror("Could not change input file descriptor. ");
+	to_execute(cmd, argv, envp);
 }
 
 int	main(int argc, char **argv, char **envp)
@@ -152,13 +100,15 @@ int	main(int argc, char **argv, char **envp)
 
 	if (argc == 5)
 	{
-		cmd.pnb = 0;
+		initialize_struct(&cmd);
 		if (access(argv[1], R_OK) == -1)
 			perror("Can't open file. ");
-		pipex(cmd, argc - 3, argv, envp);
-		free_all(cmd);
+		pipex(cmd, argv, envp);
 	}
 	else
-		return (printf("Wrong number of argument.\n"));
+	{
+		printf("Wrong number of argument.\n");
+		exit(EXIT_FAILURE);
+	}
 	return (0);
 }
