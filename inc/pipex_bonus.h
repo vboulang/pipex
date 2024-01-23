@@ -6,7 +6,7 @@
 /*   By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 14:34:08 by vboulang          #+#    #+#             */
-/*   Updated: 2024/01/11 14:33:07 by vboulang         ###   ########.fr       */
+/*   Updated: 2024/01/23 15:34:21 by vboulang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,11 +26,13 @@ typedef struct s_cmd
 	int		pnb;
 	int		fd[2];
 	int		max;
+	int		infile_ok;
 }	t_cmd;
 
 //Struct related functions (located in cmd_struct_bonus.c)
 void	initialize_struct(t_cmd *cmd, int argc);
 void	free_all(t_cmd cmd);
+void	free_and_exit(t_cmd cmd, int status);
 
 //Pipex main functions (in pipex_bonus.c)
 int		main(int argc, char **argv, char **envp);
@@ -46,5 +48,6 @@ char	*get_path(char **envp, char *str);
 //Fd related functions (in file_handling_bonus.c)
 int		change_parent_input(int fd);
 int		to_open(t_cmd cmd, char **argv);
+void	parent(t_cmd *cmd);
 
 #endif

@@ -6,7 +6,7 @@
 /*   By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 14:34:08 by vboulang          #+#    #+#             */
-/*   Updated: 2024/01/11 16:19:31 by vboulang         ###   ########.fr       */
+/*   Updated: 2024/01/23 15:33:39 by vboulang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,6 +25,7 @@ typedef struct s_cmd
 	char	**cmd;
 	int		pnb;
 	int		fd[2];
+	int		infile_ok;
 }	t_cmd;
 
 //Struct related functions (located in cmd_struct.c)
@@ -46,5 +47,6 @@ char	*get_path(char **envp, char *str);
 //Fd related functions (in file_handling.c)
 int		change_parent_input(int fd);
 int		to_open(t_cmd cmd, char **argv);
+void	parent(t_cmd *cmd);
 
 #endif

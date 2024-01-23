@@ -6,11 +6,18 @@
 /*   By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/11 14:01:47 by vboulang          #+#    #+#             */
-/*   Updated: 2024/01/11 15:21:44 by vboulang         ###   ########.fr       */
+/*   Updated: 2024/01/23 15:32:11 by vboulang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../inc/pipex.h"
+
+void	parent(t_cmd *cmd)
+{
+	cmd->infile_ok = 0;
+	if (change_parent_input(cmd->fd[0]) == -1)
+		perror("Could not change input file descriptor. ");
+}
 
 int	change_parent_input(int fd)
 {

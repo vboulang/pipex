@@ -6,7 +6,7 @@
 /*   By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/11 14:05:29 by vboulang          #+#    #+#             */
-/*   Updated: 2024/01/11 16:19:18 by vboulang         ###   ########.fr       */
+/*   Updated: 2024/01/23 14:17:45 by vboulang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -46,4 +46,5 @@ void	initialize_struct(t_cmd *cmd)
 	cmd->pnb = 0;
 	cmd->cmd = NULL;
 	cmd->path = NULL;
+	cmd->infile_ok = 0;
 }

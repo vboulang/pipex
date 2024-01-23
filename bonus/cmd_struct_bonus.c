@@ -6,7 +6,7 @@
 /*   By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/11 14:17:56 by vboulang          #+#    #+#             */
-/*   Updated: 2024/01/11 14:23:57 by vboulang         ###   ########.fr       */
+/*   Updated: 2024/01/23 15:04:20 by vboulang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,4 +41,11 @@ void	initialize_struct(t_cmd *cmd, int argc)
 	cmd->max = argc - 4;
 	cmd->cmd = NULL;
 	cmd->path = NULL;
+	cmd->infile_ok = 0;
+}
+
+void	free_and_exit(t_cmd cmd, int status)
+{
+	free_all(cmd);
+	exit(status);
 }
