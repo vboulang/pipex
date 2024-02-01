@@ -6,7 +6,7 @@
 /*   By: vboulang <vboulang@student.42quebec.com    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/12/01 14:34:12 by vboulang          #+#    #+#             */
-/*   Updated: 2024/01/23 15:36:13 by vboulang         ###   ########.fr       */
+/*   Updated: 2024/02/01 11:56:08 by vboulang         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -87,7 +87,7 @@ void	pipex(t_cmd cmd, char **argv, char **envp)
 {
 	int	fd_file;
 
-	if(cmd.infile_ok == 0)
+	if (cmd.infile_ok == 0)
 	{
 		fd_file = to_open(cmd, argv);
 		if (fd_file == -1)
